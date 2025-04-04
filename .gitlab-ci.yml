@@ -37,6 +37,7 @@ tests:
     - hummusje
   script: 
     - cd src/cat && make test && cd ../grep && make test
+    - echo "Mr.Penya is here"
   after_script:
     - cd src
     - bash run.sh
@@ -44,6 +45,7 @@ deploy-test:
   stage: deploy
   tags:
    - hummusje
+  when: manual 
   script:
    - scp src/cat/s21_cat zaza@192.10.10.1:/usr/local/bin
    - scp src/grep/s21_grep zaza@192.10.10.1:/usr/local/bin
