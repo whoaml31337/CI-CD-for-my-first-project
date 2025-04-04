@@ -1,0 +1,58 @@
+stages:         
+  - build
+  - codestyle-test
+  - func-test
+  - deploy
+
+build-job:
+  stage: build
+  tags:
+    - hummusje
+  script:
+    - cd src/cat && make all && cd ../grep/ && make all
+  after_script:
+    - cd src
+    - bash run.sh  
+  artifacts:
+    paths:
+      - ./src/cat/s21_cat
+      - ./src/grep/s21_grep
+    expire_in: 30 days
+  only:
+    - develop
+  
+codestyle-test:
+  stage: codestyle-test
+  tags:
+    - hummusje
+  script: 
+    - find . -type f -name "*.c" -exec clang-format --dry-run --Werror -style=Google {} \;
+  after_script:
+    - cd src
+    - bash run.sh
+
+tests:
+  stage: func-test
+  tags:
+    - hummusje
+  script: 
+    - cd src/cat && make test && cd ../grep && make test
+  after_script:
+    - cd src
+    - bash run.sh
+deploy-test:
+  stage: deploy
+  tags:
+   - hummusje
+  script:
+   - scp src/cat/s21_cat zaza@192.10.10.1:/usr/local/bin
+   - scp src/grep/s21_grep zaza@192.10.10.1:/usr/local/bin
+  after_script:
+    - cd src
+    - bash run.sh
+  only:
+    - develop
+
+
+  
+
